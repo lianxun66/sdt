@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>星钻夺宝</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" media="screen"
+	href="css/common.css" />
+	<link rel="icon" href="favicon.ico" type="image/x-icon" />
+<link rel="stylesheet" href="css/reset.css">
+<script src="js/vue.min.js"></script>
+<script src="http://unpkg.com/iview/dist/iview.min.js"></script>
+<link rel="stylesheet"
+	href="https://unpkg.com/iview@2.14.0-rc.2/dist/styles/iview.css">
+</head>
+<body style="font-size: 14px; line-height: 2">
+	<div class="content_box" id="app" style="display: none">
+		<div class="content_div">
+			<p v-if='account==null' class="login_p">
+				欢迎您！请先 <span class="login_1" @click="modalInfo.m_login = true">
+					[ 登录 ]</span> <span class="login_1"
+					@click="modalInfo.m_register = true;clearwallt()">[ 注册 ]</span>
+			</p>
+			<br />
+			<Row v-if='account!=null' class="userInfo"> <i-col span="24"
+				class="info-text"> 钱包地址 <span class="info-detail1">{{walletFile.name}}</span>
+			</i-col> <i-col span="24" class="info-text"> NAS余额 <span
+				class="info-detail1"> <b>{{user.NAS}}</b> <i class="nas-icon"></i>
+			</span> </i-col> <i-col span="24" class="info-text"> 星钻余额 <span
+				class="info-detail1"> <b>{{user.SDT}}</b> <i
+				class="star-icon"></i><a href="#panel"> <span class="explainTips" @click="faq_val=2">什么是星钻?</span></a>
+			</span> </i-col> <i-col span="24" class="info-text"> 今日算力 <span
+				class="info-detail1"> <b>{{user.compute}}</b> <a href="#panel"><span
+				class="explainTips" @click="faq_val=3">什么是算力?</span></a>
+			</span>
+			<span class="login_1 fl-right" @click="exit()"> [ 退出 ]</span> </i-col> </Row>
+			<br /> <br />
+			<Row class="btn-group"> <i-col span="3"> <i-button
+				type="error" size="large" @click="getUserWTLog()">夺宝记录</i-button> </i-col> <i-col
+				span="3"> <i-button type="error" size="large"
+				@click="showRecords()">福利记录</i-button> </i-col> <i-col span="3"> <i-button
+				type="error" size="large" @click="saleprizes()">邀请有奖</i-button> </i-col> <i-col
+				span="8" offset="7" class="btn-group-text"> 今日可分配NAS <span
+				class="info-detail1"> <b>{{totalFee}}</b>
+			</span> </i-col> <Row class="game-group"> <i-col span="6">
+			<div class="game-box">
+				<p class="game-title">
+					<span class="fl-left can-pointer"
+						@click="getWTLog(treasure1.name,treasure1.currentCycle);">
+						第 <b>{{treasure1.currentCycle}}</b> 期
+					</span>
+				</p>
+				<i-circle :size="200" stroke-color="#F16543"
+					:percent="treasure1.currentShare*100/treasure1.totalShare"
+					class="demo-Circle-custom">
+				<div class="demo-Circle-inner">
+					<div class="big-nas"></div>
+					<p>10 NAS</p>
+				</div>
+				</i-circle>
+				<p class="game-title">
+					<span class="fl-left can-pointer"
+						@click="getWTLog(treasure1.name,treasure1.currentCycle);">
+						已参与 <b>{{treasure1.currentShare}}</b> 份
+					</span> <span class="fl-right"> 剩余 <b>{{treasure1.totalShare-treasure1.currentShare}}</b>
+						份
+					</span>
+				</p>
+				<i-button type="error" size="large" class="join-btn"
+					@click="join_game(1)">0.1NAS立即参与</i-button>
+			</div>
+			</i-col> <i-col span="6">
+			<div class="game-box">
+				<p class="game-title">
+					<span class="fl-left can-pointer"
+						@click="getWTLog(treasure2.name,treasure2.currentCycle);">
+						第 <b>{{treasure2.currentCycle}}</b> 期
+					</span>
+				</p>
+				<i-circle :size="200" stroke-color="#F16543"
+					:percent="treasure2.currentShare*100/treasure2.totalShare"
+					class="demo-Circle-custom">
+				<div class="demo-Circle-inner">
+					<div class="big-nas"></div>
+					<p>20 NAS</p>
+				</div>
+				</i-circle>
+				<p class="game-title">
+					<span class="fl-left  can-pointer"
+						@click="getWTLog(treasure2.name,treasure2.currentCycle);">
+						已参与 <b>{{treasure2.currentShare}}</b> 份
+					</span> <span class="fl-right"> 剩余 <b>{{treasure2.totalShare-treasure2.currentShare}}</b>
+						份
+					</span>
+				</p>
+				<i-button type="error" size="large" class="join-btn"
+					@click="join_game(2)">0.1NAS立即参与</i-button>
+			</div>
+			</i-col> <i-col span="6">
+			<div class="game-box">
+				<p class="game-title">
+					<span class="fl-left can-pointer"
+						@click="getWTLog(treasure3.name,treasure3.currentCycle);">
+						第 <b>{{treasure3.currentCycle}}</b> 期
+					</span>
+				</p>
+				<i-circle :size="200" stroke-color="#F16543"
+					:percent="treasure3.currentShare*100/treasure3.totalShare"
+					class="demo-Circle-custom">
+				<div class="demo-Circle-inner">
+					<div class="big-nas"></div>
+					<p>30 NAS</p>
+				</div>
+				</i-circle>
+				<p class="game-title">
+					<span class="fl-left can-pointer"
+						@click="getWTLog(treasure3.name,treasure3.currentCycle);">
+						已参与 <b>{{treasure3.currentShare}}</b> 份
+					</span> <span class="fl-right"> 剩余 <b>{{treasure3.totalShare-treasure3.currentShare}}</b>
+						份
+					</span>
+				</p>
+				<i-button type="error" size="large" class="join-btn"
+					@click="join_game(3)">0.1NAS立即参与</i-button>
+			</div>
+			</i-col> <i-col span="6">
+			<div class="game-box">
+				<p class="game-title">
+					<span class="fl-left can-pointer"
+						@click="getWTLog(treasure4.name,treasure4.currentCycle);">
+						第 <b>{{treasure4.currentCycle}}</b> 期
+					</span>
+				</p>
+				<i-circle :size="200" stroke-color="#F16543"
+					:percent="treasure4.currentShare*100/treasure4.totalShare"
+					class="demo-Circle-custom">
+				<div class="demo-Circle-inner">
+					<div class="big-nas"></div>
+					<p>50 NAS</p>
+				</div>
+				</i-circle>
+				<p class="game-title">
+					<span class="fl-left can-pointer"
+						@click="getWTLog(treasure4.name,treasure4.currentCycle);">
+						已参与 <b>{{treasure4.currentShare}}</b> 份
+					</span> <span class="fl-right"> 剩余 <b>{{treasure4.totalShare-treasure4.currentShare}}</b>
+						份
+					</span>
+				</p>
+				<i-button type="error" size="large" class="join-btn"
+					@click="join_game(4)">0.1NAS立即参与</i-button>
+			</div>
+			</i-col> </Row> </Row>
+			<br /> <br /> <br />
+			<Row class="faq-group">
+			<p class="faq-title">问题汇总</p>
+			<Collapse v-model="faq_val" accordion="true" id="panel"> <Panel name="1"> 夺宝规则
+			<p slot="content">
+				第一步：参与星钻夺宝需要先<a @click="modalInfo.m_register = true;clearwallt()">注册</a>、<a
+					@click="modalInfo.m_login = true">登录</a>星云钱包 <br>
+				第二步：保证您的星云钱包中有充足的余额，星云币可以在各大交易所购买并提现到您的钱包 <br>
+				第三步：挑选合适的奖品，参与夺宝（每个奖品分配对应数量的号码，并且这些号码都是唯一的，用户消耗0.1个NAS星云币，可以获得其中1个号码，用户获得的号码由与当前购买的份数相同，获得号码就是参与成功了）；
+				<br>
+				第四步：等待揭晓，幸运者获得奖品，当奖品的所有号码都被分配完毕后，区块链将随机算出1个幸运号码，持有该号码的用户，直接获得该奖品。
+			</p>
+			</Panel> <Panel name="2"> 什么是星钻?
+			<p slot="content">
+				星钻（简称SDT）是由星钻夺宝团队全球发行的基于星云链 NRC20
+				的去中心化的区块链平台积分。 <br> 星钻 总发行量为
+				3650万枚，不预售，不预留，不ICO，其中300万枚用于推广赠送，剩余3350万枚将根据用户算力占比每日释放10W，直至第335天释放完毕。
+				<br> 
+				平台所有收入将依据星钻占比平分给各位用户！！！
+				 <br> <br> <span
+					style="color: #e45944;">如：您持有10000星钻，星钻总释放量为100000，今日夺宝活动共收手续费100NAS，您将获得:10000/100000*100=10NAS
+					的奖励</span>
+			</p>
+			</Panel> <Panel name="3"> 什么是算力?
+			<p slot="content">
+				算力是除推广外获得星钻的唯一方式，每日将有10万星钻根据算力占比均分 <br>用户每消耗0.1星云币用于夺宝将获得1算力，同时为了激励用户积极参与夺宝活动，用户还会获得（号码总份数-您的号码）/100的算力奖励。
+				<br> <br> <span style="color: #e45944;">如：您消费0.1NAS参与50NAS夺宝活动，拿到了1号号码，您将获得：（总份数525-您的号码1）/100+正常算力1=6.24的算力</span>
+				<br> <span style="color: #e45944;">
+					如：今日总算力为100，您将获得：您的算力6.24/总算力100*星钻分发数100000=6240的星钻 的奖励</span>
+			</p>
+			</Panel> 
+			<Panel name="4"> 怎样保证公开公平公正?
+			<p slot="content">
+				星钻夺宝是基于区块链而进行的夺宝活动 ，团队无任何一台服务器保存用户数据，所有数据均在区块链上，不可逆改<br>公开：星钻夺宝所有代码与合约均开源，用户可以自行阅读。<a
+					href="https://explorer.nebulas.io/#/tx/22ac498d0b6129c1234bd0da685261ee7576df25bad9e3dd380c0e04c5d32bab"
+					target="_blank">点击查看合约代码</a>&nbsp; &nbsp; &nbsp;     <a
+					href="https://github.com/ChengOrangeJu/WebExtensionWallet"
+					target="_blank">点击查看浏览器代码</a>
+					<br>公平：幸运者号码由随机数得来，每个号码都是同一份权益，不存在特殊性
+					<br>公正：团队始终秉持着以改变竞彩等各行业黑幕为目的初心，团队绝不偏袒任何用户任何一方
+			</p>
+			</Panel>
+			<Panel name="5"> 怎样提交问题?
+			<p slot="content">
+				请发送邮件至：zicen0001@163.com
+			</p>
+			</Panel>
+			</Collapse> </Row>
+		</div>
+		<div v-if='modalInfo.m_login'>
+			<Modal v-model="modalInfo.m_login" width="480">
+			<p slot="header" style="color: #f60; text-align: center">
+				<span>您将用以下哪种方式登录？</span>
+			</p>
+			<div class="login-content">
+				<Tabs> <tab-pane label="文件 / 密码" class="log-type1-box">
+				<Row class="log-type1-1"> <i-col span="4" offset="2">
+				您的钱包： </i-col> <i-col span="18"> <Upload
+					:before-upload="selectWallet"> <i-button type="ghost"
+					class="select-wallet-btn">选择钱包文件</i-button> </Upload> </i-col> <i-col span="22"
+					offset="2">
+				<div v-if="walletFile !== null">钱包地址： {{ walletFile.name }}</div>
+				</i-col> </Row> <Row class="log-type1-1"> <i-col span="22" offset="2">
+				<span class="label">钱包密码：</span> <i-input placeholder="请输入您的钱包密码"
+					v-model="walletFile.value" type="password" style="width:240px;"></i-input>
+				</i-col> <i-col span="22" offset="2">
+				<p v-if='true' class="error-tips" style="margin-left: 82px;">{{walletFile.msg}}</p>
+				</i-col> </Row> </tab-pane> <tab-pane label="JSON / 密码"> <Row class="log-type1-1">
+				<i-col span="22" offset="2"> <span class="label">钱包JSON：</span>
+				<i-input type="textarea" :autosize="{minRows: 4,maxRows: 4}"
+					v-model="walletFile.key" style="width:280px;"></i-input> </i-col> </Row> <Row
+					class="log-type1-1"> <i-col span="22" offset="2"> <span
+					class="label">钱包密码：</span> <i-input v-model="walletFile.value"
+					type="password" style="margin-left:10px;width:280px;"
+					placeholder="请输入您的钱包密码"></i-input> </i-col> <i-col span="22" offset="2">
+				<p v-if='true' class="error-tips" style="margin-left: 82px;">{{walletFile.msg}}</p>
+				</i-col> </Row> </tab-pane> </Tabs>
+			</div>
+			<div slot="footer" style="text-align: center;">
+				<i-button type="error" size="large" @click="unlock()">立即解锁</i-button>
+				<a
+					@click="modalInfo.m_register=true;modalInfo.m_login=false;clearwallt()">暂无钱包？立即注册</a>
+			</div>
+			</Modal>
+		</div>
+		<div v-if='modalInfo.m_register'>
+			<Modal v-model="modalInfo.m_register" width="480"
+				:mask-closable="false">
+			<p slot="header" style="color: #f60; text-align: center">
+				<span>星云币钱包注册</span>
+			</p>
+			<div class="register-content">
+				<template v-if="walletFile.regstep">
+				<div style="height: 58px;">
+					<span class="label">钱包密码：</span>
+					<i-input placeholder="请输入钱包密码（最少9位）" v-model="walletFile.regpass"
+						style="width:315px;"></i-input>
+					<p v-if='errorTips.reg_password' class="error-tips"
+						style="margin: 5px 0 0 82px;">您的密码必须至少为6位，请确保它是一个强密码。</p>
+				</div>
+				<i-button class="reg_btn" @click="regWallet()" type="error">创建我的钱包</i-button>
+				</template>
+				<template v-else>
+				<div style="margin: 15px 0 10px 0">
+					<span class="label">钱包JSON：</span>
+					<i-input readonly type="textarea" v-model="walletFile.regkey"
+						:autosize="{minRows: 5,maxRows: 5}" style="width:305px;"></i-input>
+				</div>
+				<i-button class="reg_btn" type="error" @click="downregkey()">下载钱包文件</i-button>
+				</template>
+			</div>
+			<div slot="footer">
+				<span class="reg_href"
+					@click="modalInfo.m_register=false;clearwallt();modalInfo.m_login=true;">
+					已有钱包？立即登录 </span>
+			</div>
+			</Modal>
+		</div>
+		<div v-if="modalInfo.prize_records">
+			<Modal v-model="modalInfo.prize_records" width="850">
+			<p slot="header">
+				<span>夺宝记录</span>
+			</p>
+			<div>
+				<p class="prize-title">个人夺宝记录</p>
+				<div class="prize-box">
+					<div class="prize-info">
+						<p class="prize-text1 fl-left">
+							累计获得：<b>{{userWT.winNas}}</b> NAS
+						</p>
+					</div>
+					<Row class="prize-list-title"> <i-col span="6"> 宝贝名称
+					</i-col> <i-col span="6"> 期数 </i-col> <i-col span="6"> 号牌 </i-col> <i-col
+						span="4"> 是否中奖 </i-col> </Row>
+					<ul class="prize-list">
+						<li v-for="(log,key,index) in userWT.logs"
+							v-if="index>=(userWT.currentPage-1)*10&&index<userWT.currentPage*10"><Row
+								class="prize-list-detail"> <i-col span="6">
+							{{key.split("_")[0]}} </i-col> <i-col span="6"> 第 <span>{{key.split("_")[1]}}</span>
+							期 </i-col> <i-col span="6"> {{log.codes}} </i-col> <i-col span="6">
+							<span v-if="log.winStatus" style="color: #ED2688">中奖</span> <span
+								v-else>未中奖</span> </i-col> </Row></li>
+
+					</ul>
+				</div>
+			</div>
+			<div slot="footer">
+				<Page class="text-center" :current="userWT.currentPage"
+					:total="userWT.logSize" @on-change="userWTPage" show-total></Page>
+			</div>
+			</Modal>
+		</div>
+		<div v-if="modalInfo.welfare_records">
+			<Modal v-model="modalInfo.welfare_records" width="850">
+			<p slot="header">
+				<span>福利记录</span>
+			</p>
+			<div>
+				<p class="prize-title">个人福利记录</p>
+				<div class="prize-box">
+					<div class="prize-info">
+						<p class="prize-text1 fl-left">
+							累计获得：<b>{{Math.round(WelfareLog.winNas*10000)/10000}}</b> NAS <b>{{Math.round(WelfareLog.winSdt*10000)/10000}}</b>
+							星钻
+						</p>
+					</div>
+					<Row class="prize-list-title"> <i-col span="5"> 日期 </i-col> <i-col
+						span="5"> 当日星钻 </i-col> <i-col span="5"> 当日算力 </i-col> <i-col
+						span="5"> 获得NAS </i-col> <i-col span="4"> 获得星钻 </i-col> </Row>
+					<ul class="prize-list">
+						<li v-for="(log,key,index) in WelfareLog.logs"
+							v-if="index>=(WelfareLog.currentPage-1)*10&&index<WelfareLog.currentPage*10"><Row
+								class="prize-list-detail"> <i-col span="5"> {{new
+							Date(Number(key)).toLocaleDateString()}} </i-col> <i-col span="5">{{Math.round(log.sdt*10000)/10000||0}}</i-col>
+							<i-col span="5">
+							{{Math.round(log.compute*10000)/10000||0}} </i-col> <i-col span="5">
+							<span style="color: #ED2688">+{{Math.round(log.bonusNas*10000)/10000||0}}</span>
+							</i-col> <i-col span="4"> <span v-if="true"
+								style="color: #ED2688">+{{Math.round(log.bonusSdt*10000)/10000||0}}</span>
+							<span v-else>未中奖</span> </i-col> </Row></li>
+
+					</ul>
+				</div>
+			</div>
+			<div slot="footer">
+				<Page class="text-center" :current="WelfareLog.currentPage"
+					@on-change="WelfareLogPage" :total="WelfareLog.logSize" show-total></Page>
+			</div>
+			</Modal>
+		</div>
+		<div v-if="modalInfo.m_invite">
+			<Modal v-model="modalInfo.m_invite" class="invite-modal" width="850">
+			<p slot="header">
+				<span>邀请好友</span>
+			</p>
+			<div>
+				<div class="invite-div">
+					<p class="invite-p1 text-center">推荐星钻夺宝给好友，好友登录并夺宝一次后，双方都将获得50星钻奖励</p>
+					<p class="invite-p1 text-center">
+						您的专属邀请链接：<br />
+					</p>
+					<p class="invite-p3 text-center">快跟我一起来星钻游乐场参加夺宝活动吧，还有机会获得50星钻奖励哦！</p>
+					<p class="invite-p3 text-center">
+						<span>file:///D:/workspace/SDT/xl_project1.0/index.html?v={{walletFile.name}}</span>
+					</p>
+					<input id="saleHttp" type="text" style="display: none"
+						:value="'快跟我一起来星钻游乐场参加夺宝活动吧，还有机会获得50星钻奖励哦！file:///D:/workspace/SDT/xl_project1.0/index.html?v='+walletFile.name">
+					<i-button type="error" @click="copyHttp()" class="invite-btn">点击复制邀请链接</i-button>
+				</div>
+			</div>
+			<div slot="footer"></div>
+			</Modal>
+		</div>
+		<div v-if="modalInfo.m_payment">
+			<Modal v-model="modalInfo.m_payment" class="invite-modal" width="420">
+			<p slot="header">
+				<span>支付提示</span>
+			</p>
+			<div class="payment-box">
+				<Row> <i-col span="11" class="text-right label"> <span
+					class="label">购宝类别：</span> </i-col> <i-col span="11" offset="1"
+					class="label"> <span>{{pay.name}}</span> 夺宝 </i-col> </Row>
+				<Row> <i-col span="11" class="text-right label"> <span
+					class="label">剩余份数：</span> </i-col> <i-col span="11" offset="1"
+					class="label"> <span>{{pay.totalShare-pay.currentShare}}</span>
+				份 </i-col> </Row>
+				<Row> <i-col span="11" class="text-right label"> <span>购买份数：</span>
+				</i-col> <i-col span="11" offset="1"> <input-number :min="1"
+					:max="pay.totalShare-pay.currentShare"
+					@on-focus="inputBlur($event)" v-model="pay.copies"></input-number>
+				</i-col> </Row>
+				<Row> <i-col span="11" class="text-right label"> <span>共需支付：</span>
+				</i-col> <i-col span="11" offset="1" class="label"> <span>{{pay.copies/10}}</span>
+				NAS </i-col> </Row>
+
+				<i-button type="error" @click="payWT()" class="payment-btn">确认支付</i-button>
+			</div>
+			<div slot="footer"></div>
+			</Modal>
+		</div>
+		<div v-if="modalInfo.m_qishu">
+			<Modal v-model="modalInfo.m_qishu" width="850">
+			<p slot="header">
+				<span>{{WTLog.name}}夺宝详情 </span>
+			</p>
+			<div>
+				<p class="prize-title">{{WTLog.name}}夺宝 第 {{WTLog.cycle}} 期</p>
+				<div class="prize-box">
+					<div class="prize-info">
+						<p class="prize-text1 fl-left">
+							<span class="prize-code">开奖号牌：<b> {{WTLog.winCode}}</b></span>
+						</p>
+						<p class="prize-text2 fl-right">
+							第&nbsp;&nbsp;
+							<input-number :min="1" :max="WTLog.currentCycle"
+								@on-focus="inputBlur($event)"
+								@on-change="getWTLog(WTLog.name,WTLog.cycle)"
+								v-model="WTLog.cycle"></input-number>
+							&nbsp;&nbsp;期
+						</p>
+					</div>
+					<Row class="prize-list-title"> <i-col span="16"> 钱包地址
+					</i-col> <i-col span="5" offset="3"> 号牌 </i-col> </Row>
+					<ul class="prize-list">
+						<li v-for="(address,code,index) in WTLog.bids"
+							v-if="index>=(WTLog.currentPage-1)*10&&index<WTLog.currentPage*10"><Row
+								class="prize-list-detail"> <i-col span="16">
+							{{address}} </i-col> <i-col span="5" offset="3"> {{code}} </i-col> </Row></li>
+					</ul>
+				</div>
+			</div>
+			<div slot="footer">
+				<Page class="text-center" :current="WTLog.currentPage"
+					@on-change="WTLogPage" :total="WTLog.logSize" show-total></Page>
+			</div>
+			</Modal>
+		</div>
+		
+	</div>
+	<script type="text/javascript" src="js/nebulas.js"></script>
+	<script>
+		var HttpRequest = require("nebulas").HttpRequest;
+		var Neb = require("nebulas").Neb;
+		var Account = require("nebulas").Account;
+		var Transaction = require("nebulas").Transaction;
+		var Unit = require("nebulas").Unit;
+		var neb = new Neb();
+		neb.setRequest(new HttpRequest("https://mainnet.nebulas.io"));
+	</script>
+	<script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>
