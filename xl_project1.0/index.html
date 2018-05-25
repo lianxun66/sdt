@@ -188,7 +188,7 @@
 				星钻夺宝是基于区块链而进行的夺宝活动 ，团队无任何一台服务器保存用户数据，所有数据均在区块链上，不可逆改<br>公开：星钻夺宝所有代码与合约均开源，用户可以自行阅读。<a
 					href="https://explorer.nebulas.io/#/tx/22ac498d0b6129c1234bd0da685261ee7576df25bad9e3dd380c0e04c5d32bab"
 					target="_blank">点击查看合约代码</a>&nbsp; &nbsp; &nbsp;     <a
-					href="https://github.com/ChengOrangeJu/WebExtensionWallet"
+					href="https://github.com/lianxun66/sdt"
 					target="_blank">点击查看浏览器代码</a>
 					<br>公平：幸运者号码由随机数得来，每个号码都是同一份权益，不存在特殊性
 					<br>公正：团队始终秉持着以改变竞彩等各行业黑幕为目的初心，团队绝不偏袒任何用户任何一方
@@ -213,7 +213,7 @@
 					:before-upload="selectWallet"> <i-button type="ghost"
 					class="select-wallet-btn">选择钱包文件</i-button> </Upload> </i-col> <i-col span="22"
 					offset="2">
-				<div v-if="walletFile !== null">钱包地址： {{ walletFile.name }}</div>
+				<div v-if="walletFile.name !== null">钱包地址： {{ walletFile.name }}</div>
 				</i-col> </Row> <Row class="log-type1-1"> <i-col span="22" offset="2">
 				<span class="label">钱包密码：</span> <i-input placeholder="请输入您的钱包密码"
 					v-model="walletFile.value" type="password" style="width:240px;"></i-input>

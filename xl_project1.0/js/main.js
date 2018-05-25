@@ -178,7 +178,6 @@ var vm = new Vue({
             showRecords(){
         	  		if(!this.account){
                 		 this.$Message.error({ content: '请先登录！',duration: 3});
-                		this.modalInfo.m_login=true;
                 		return ;
                 	}
     	  		this.readNas("welfareLogs",'["'+this.account.getAddressString()+'"]',function(data){
@@ -315,7 +314,6 @@ var vm = new Vue({
             	}
             	if(!this.account){
             		this.$Message.error({ content: '请先登录！',duration: 3});
-            		this.modalInfo.m_login=true;
             		return ;
             	}
             	if(this.pay.copies/10>=this.user.NAS){
@@ -376,7 +374,6 @@ var vm = new Vue({
             getUserWTLog(){
             	if(!this.account){
             		this.$Message.error({ content: '请先登录！',duration: 3});
-            		this.modalInfo.m_login=true;
             		return ;
             	}
             	this.readNas("partakeLogs",'["'+this.walletFile.name+'"]',function(data){
@@ -399,7 +396,6 @@ var vm = new Vue({
             saleprizes(){
             	if(!this.account){
             		this.$Message.error({ content: '请先登录！',duration: 3});
-            		this.modalInfo.m_login=true;
             		return ;
             	}
             	this.modalInfo.m_invite=true;
