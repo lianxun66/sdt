@@ -269,7 +269,7 @@ SDTRecreationGroundContract.prototype = {
           this._sdtHolderSize=0;//持有星钻总人数
           this._computeHolderSize=0;//持有算力人数
           this. _surplusSalesReward= new BigNumber(3000000).mul(this._pow18),  //剩余推广奖励总数
-          this. _salesReward= new BigNumber(50).mul(this._pow18),  //每人推广奖励数
+          this. _salesReward= new BigNumber(500).mul(this._pow18),  //每人推广奖励数
           this. _totalCompute=new BigNumber(0);//总算力
           this. _totalFee=new BigNumber(0).mul(this._pow18);//总手续费
           this. _SDTCirculation= new BigNumber(0).mul(this._pow18);//总流通星钻数
@@ -343,7 +343,7 @@ SDTRecreationGroundContract.prototype = {
     },
    _balanceOfowner: function (owner) {
         var balance = this.balances.get(owner);
-        if (balance) {
+        if (balance instanceof BigNumber) {
             return balance;
         } else {
         	this.sdtHolders.put(this._sdtHolderSize,owner);
@@ -531,11 +531,11 @@ SDTRecreationGroundContract.prototype = {
     			}
 		    	 if(!this.salesmans.get(from)){
 		    		 if(this._surplusSalesReward.gte(this._salesReward.mul(2))){
-		    			  var balance=this.balances.get(from) || new BigNumber(0);
+		    			  var balance=this._balanceOfowner(from) ;
 		    			  this.balances.set(from,balance.add(this._salesReward));
 		    			  this.transferEvent(true, from, from, this._salesReward);
 		    			  
-		    			  var salesmanBalance=this.balances.get(salesman) || new BigNumber(0);
+		    			  var salesmanBalance=this._balanceOfowner(salesman) ;
 		    			  this.balances.set(salesman,salesmanBalance.add(this._salesReward));
 		    			  this.transferEvent(true, from, salesman, this._salesReward);
 		    			  

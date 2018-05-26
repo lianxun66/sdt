@@ -48,7 +48,7 @@ var vm = new Vue({
         		currentPage:1,
         		logSize:null
         	},
-        	SDTAddress:"n1w8ZD5osuFFeUjbysEHvW53ahCd5GaUphW",
+        	SDTAddress:"n1h2KMrKbeQdTV39rNH7i6nee4Ba6j3MxCk",
         	account:null,
             faq_val:1,
             pay:{
@@ -321,6 +321,7 @@ var vm = new Vue({
             		 return;
             	}
             	var saleString=saleAddress?',"'+saleAddress+'"':"";
+            	console.log(saleString);
         	    this.sendNas("attendWT" ,'["'+this.pay.name+'"'+saleString+']',this.pay.copies/10,function(data){
             		vm.$Message.info({ content: '提交成功，请等待区块链确认！',duration: 3});
             		var hash=data.txhash;
@@ -345,6 +346,7 @@ var vm = new Vue({
         	            });
                     },7000,hash);
             	 });
+        	     this.pay.copies=1;
             	 this.modalInfo.m_payment=false;
             } ,
             verifyLogin(){
