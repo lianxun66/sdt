@@ -17,14 +17,14 @@
 <body style="font-size: 14px; line-height: 2">
 	<div class="content_box" id="app" style="display: none">
 		<div class="content_div">
-			<p v-if='account==null' class="login_p">
+			<p v-if='user.address==null' class="login_p">
 				欢迎您！请先 <span class="login_1" @click="modalInfo.m_login = true">
 					[ 登录 ]</span> <span class="login_1"
 					@click="modalInfo.m_register = true;clearwallt()">[ 注册 ]</span>
 			</p>
 			<br />
-			<Row v-if='account!=null' class="userInfo"> <i-col span="24"
-				class="info-text"> 钱包地址 <span class="info-detail1">{{walletFile.name}}</span>
+			<Row v-if='user.address!=null' class="userInfo"> <i-col span="24"
+				class="info-text"> 钱包地址 <span class="info-detail1">{{user.address}}</span>
 			</i-col> <i-col span="24" class="info-text"> NAS余额 <span
 				class="info-detail1"> <b>{{user.NAS}}</b> <i class="nas-icon"></i>
 			</span> </i-col> <i-col span="24" class="info-text"> 星钻余额 <span
@@ -186,7 +186,7 @@
 			<Panel name="4"> 怎样保证公开公平公正?
 			<p slot="content">
 				星钻夺宝是基于区块链而进行的夺宝活动 ，团队无任何一台服务器保存用户数据，所有数据均在区块链上，不可逆改<br>公开：星钻夺宝所有代码与合约均开源，用户可以自行阅读。<a
-					href="https://explorer.nebulas.io/#/tx/22ac498d0b6129c1234bd0da685261ee7576df25bad9e3dd380c0e04c5d32bab"
+					href="https://explorer.nebulas.io/#/tx/a569862cdff79b6ddd3469ed4b9c1746a53d7d20ad8f260a8c48f8f694ae623d"
 					target="_blank">点击查看合约代码</a>&nbsp; &nbsp; &nbsp;     <a
 					href="https://github.com/lianxun66/sdt"
 					target="_blank">点击查看浏览器代码</a>
@@ -355,10 +355,10 @@
 					</p>
 					<p class="invite-p3 text-center">快跟我一起来星钻游乐场参加夺宝活动吧，还有机会获得500星钻奖励哦！</p>
 					<p class="invite-p3 text-center">
-						<span>http://www.lianxun66.com/?v={{walletFile.name}}</span>
+						<span>http://www.lianxun66.com/?v={{user.address}}</span>
 					</p>
 					<input id="saleHttp" type="text" style="display: none"
-						:value="'快跟我一起来星钻游乐场参加夺宝活动吧，还有机会获得500星钻奖励哦！http://www.lianxun66.com/?v='+walletFile.name">
+						:value="'快跟我一起来星钻游乐场参加夺宝活动吧，还有机会获得500星钻奖励哦！http://www.lianxun66.com/?v='+user.address">
 					<i-button type="error" @click="copyHttp()" class="invite-btn">点击复制邀请链接</i-button>
 				</div>
 			</div>
@@ -432,6 +432,7 @@
 		
 	</div>
 	<script type="text/javascript" src="js/nebulas.js"></script>
+	<script type="text/javascript" src="js/nebPay.js"></script>
 	<script>
 		var HttpRequest = require("nebulas").HttpRequest;
 		var Neb = require("nebulas").Neb;
@@ -440,6 +441,8 @@
 		var Unit = require("nebulas").Unit;
 		var neb = new Neb();
 		neb.setRequest(new HttpRequest("https://mainnet.nebulas.io"));
+		var NebPay = require("nebpay");
+		var nebPay = new NebPay();
 	</script>
 	<script type="text/javascript" src="js/main.js"></script>
 </body>

@@ -70,6 +70,7 @@ var vm = new Vue({
             },
             
             user:{
+            	address:null,
             	NAS:0,
             	SDT:0,
             	compute:0
@@ -135,7 +136,7 @@ var vm = new Vue({
         	}  
         	,
         	readNas( funNume ,args,call){
-        	  	  var from=this.account?this.account.getAddressString():this.SDTAddress;
+        	  	  var from=this.user.address?this.user.address:this.SDTAddress;
         	  	  neb.api.call({
         	  	     chainID: 1,
         	  	     from: from,
@@ -151,8 +152,8 @@ var vm = new Vue({
         	  	  }).then(call);
         	  },
         	   sendNas(funNume ,args,value,call){
-        	  	   if(!this.account.privKey){
-        	  		 vm.$Message.error({ content: "请先登录!!!",duration: 3});
+        	  	   if(!this.user.address){
+        	  		   vm.$Message.error({ content: "请先登录!!!",duration: 3});
         	  		   return
         	  	   }
         	  	   neb.api.getAccountState(this.account.getAddressString()).then(function (state) {
@@ -176,11 +177,11 @@ var vm = new Vue({
         	  	   });
         	  	},
             showRecords(){
-        	  		if(!this.account){
+        	  		if(!this.user.address){
                 		 this.$Message.error({ content: '请先登录！',duration: 3});
                 		return ;
                 	}
-    	  		this.readNas("welfareLogs",'["'+this.account.getAddressString()+'"]',function(data){
+    	  		this.readNas("welfareLogs",'["'+this.user.address+'"]',function(data){
             		var result=JSON.parse(data.result);
             		vm.WelfareLog.winNas=result.winNas;
             		vm.WelfareLog.winSdt=result.winSdt;
@@ -247,6 +248,7 @@ var vm = new Vue({
             	try{
             		var acc=new Account().fromKey(this.walletFile.key, this.walletFile.value);
             		this.account=acc;
+            		this.user.address=this.account.getAddressString();
             	}catch (e) {
             		console.log(e);
             		this.walletFile.msg="文件或密码错误！！";
@@ -261,12 +263,11 @@ var vm = new Vue({
         		this.$Message.success({ content: '钱包登录成功！',duration: 3});
             },
             getUserInfo(){
-            	this.walletFile.name=this.account.getAddressString();
             	this.flushNAS();
             	this.flushSDT();
             },
             flushNAS(){
-            	neb.api.getAccountState(this.account.getAddressString()).then(function (state) {
+            	neb.api.getAccountState(this.user.address).then(function (state) {
                     state = state.result || state;
                     vm.user.NAS=state.balance/1000000000000000000;
                 }).catch(function (err) {
@@ -274,7 +275,7 @@ var vm = new Vue({
                 })
             },
             flushSDT(){
-            	this.readNas("getInfo",'["'+this.account.getAddressString()+'"]',function(data){
+            	this.readNas("getInfo",'["'+this.user.address+'"]',function(data){
             		 var result=JSON.parse(data.result);
             		 vm.user.SDT=result.sdt;
             		 vm.user.compute=result.compute;
@@ -312,7 +313,7 @@ var vm = new Vue({
             		this.$Message.error({ content: '已有一笔交易正在确认中，请稍后再试！',duration: 3});
             		return ;
             	}
-            	if(!this.account){
+            	if(!this.user.address){
             		this.$Message.error({ content: '请先登录！',duration: 3});
             		return ;
             	}
@@ -321,50 +322,81 @@ var vm = new Vue({
             		 return;
             	}
             	var saleString=saleAddress?',"'+saleAddress+'"':"";
-            	console.log(saleString);
-        	    this.sendNas("attendWT" ,'["'+this.pay.name+'"'+saleString+']',this.pay.copies/10,function(data){
-            		vm.$Message.info({ content: '提交成功，请等待区块链确认！',duration: 3});
-            		var hash=data.txhash;
-            		vm.intervalId=setInterval( function (hash){
-                    	neb.api.getTransactionReceipt(hash).then( function (result) {
-    				 		if(result.status==1){
-    				 			vm.$Message.success({ content: '恭喜您，参与夺宝成功！！！',duration: 3});
-    				 			window.clearInterval(vm.intervalId);
-    				 			vm.intervalId=null;
-    				 			vm.loadTreasure();
-    				 			vm.flushTotalFee();
-    				 			vm.getUserInfo();
-    				 		}else if(result.status==0){
-    				 			vm.$Message.error({ content: '参与夺宝失败，请稍后再试！！！',duration: 3});
-    				 			window.clearInterval(vm.intervalId);
-    				 			vm.intervalId=null;
-    				 		}else if(result.status==2){
-    				 		}else{
-    				 			window.clearInterval(vm.intervalId);
-    				 			vm.intervalId=null;
-    				 		}
-        	            });
-                    },7000,hash);
-            	 });
+            	if(this.account){
+            		this.sendNas("attendWT" ,'["'+this.pay.name+'"'+saleString+']',this.pay.copies/10,this.WTcall);
+            	}else{
+            		nebPay.call(this.SDTAddress, this.pay.copies/10, "attendWT", '["'+this.pay.name+'"'+saleString+']',{listener:this.WTcall});
+            	}
         	     this.pay.copies=1;
             	 this.modalInfo.m_payment=false;
             } ,
+            WTcall(data){
+            	console.log(1);
+        		vm.$Message.info({ content: '提交成功，请等待区块链确认！',duration: 3});
+        		var hash=data.txhash;
+        		console.log(hash);
+        		vm.intervalId=setInterval( function (hash){
+                	neb.api.getTransactionReceipt(hash).then( function (result) {
+				 		if(result.status==1){
+				 			vm.$Message.success({ content: '恭喜您，参与夺宝成功！！！',duration: 3});
+				 			window.clearInterval(vm.intervalId);
+				 			vm.intervalId=null;
+				 			vm.loadTreasure();
+				 			vm.flushTotalFee();
+				 			vm.getUserInfo();
+				 		}else if(result.status==0){
+				 			vm.$Message.error({ content: '参与夺宝失败，请稍后再试！！！',duration: 3});
+				 			window.clearInterval(vm.intervalId);
+				 			vm.intervalId=null;
+				 		}else if(result.status==2){
+				 		}else{
+				 			window.clearInterval(vm.intervalId);
+				 			vm.intervalId=null;
+				 		}
+    	            });
+                },7000,hash);
+        	 }
+            ,
             verifyLogin(){
             	if(this.walletFile.key&&this.walletFile.value){
             		try{
                 		var acc=new Account().fromKey(this.walletFile.key, this.walletFile.value);
                 		this.account=acc;
+                		this.user.address=this.account.getAddressString();
                 	}catch (e) {
                 		console.log(e);
                 		return;
                 	}
             		this.getUserInfo();
+            	}else {
+            		 if(typeof(webExtensionWallet) !== "undefined") {
+            			 window.addEventListener('message', this.getMessage);
+            			 window.postMessage({
+            			        "target": "contentscript",
+            			        "data": {},
+            			        "method": "getAccount",
+            			    }, "*");
+            	 	 }
             	}
             },
+             getMessage(e){
+                if (e.data && e.data.data) {
+                    console.log("e.data.data:", e.data.data)
+                    if (e.data.data.account) {
+                        var address = e.data.data.account;
+                        console.log("address="+address);
+                        this.user.address=address;
+                        this.getUserInfo();
+                    }
+                }
+               
+            }
+            ,
             exit(){
             	this.account=null;
             	localStorage.removeItem("json");
             	localStorage.removeItem("pass");
+            	this.user.address=null;
             },
             getObjectCount(obj){
             	  var n = 0;  
@@ -374,11 +406,11 @@ var vm = new Vue({
                   return n;  
             },
             getUserWTLog(){
-            	if(!this.account){
+            	if(!this.user.address){
             		this.$Message.error({ content: '请先登录！',duration: 3});
             		return ;
             	}
-            	this.readNas("partakeLogs",'["'+this.walletFile.name+'"]',function(data){
+            	this.readNas("partakeLogs",'["'+this.user.address+'"]',function(data){
             		var result=JSON.parse(data.result);
             		vm.userWT.winNas=result.winNas;
             		vm.userWT.logs=result.logs;
@@ -396,7 +428,7 @@ var vm = new Vue({
             	this.WelfareLog.currentPage=currentPage;
             },
             saleprizes(){
-            	if(!this.account){
+            	if(!this.user.address){
             		this.$Message.error({ content: '请先登录！',duration: 3});
             		return ;
             	}
